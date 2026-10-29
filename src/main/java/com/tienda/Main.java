@@ -1,6 +1,7 @@
 package com.tienda;
 
 import com.mongodb.client.*;
+import com.tienda.dao.ProductoDAO;
 import org.bson.Document;
 import org.basex.core.Context;
 import org.basex.core.StaticOptions;
@@ -13,6 +14,17 @@ public class Main {
 
     public static void main(String[] args) {
 
+        //1. inicilizar conexion
+        ConexionDB conexion = new ConexionDB();
+        conexion.conectar();
 
+        //2. Crear DAOss pasando conexion
+        ProductoDAO productoDAO = new ProductoDAO(conexion.getBaseXCtx());
+
+        //3. Arrancamos el meenu
+        Menu menu = new Menu(productoDAO);
+        menu.mostrarMenu();
+
+        conexion.desconectar();
     }
 }

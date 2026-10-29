@@ -12,8 +12,8 @@ public class ConexionDB {
 
     // Abrir conexiones
 
-    public void conectar(){
-        try{
+    public void conectar() {
+        try {
             // 1.Conexion BaseeX
             baseXCtx = new Context();
             baseXCtx.soptions.set(StaticOptions.DBPATH, System.getProperty("user.home") + "/BaseX/data");
@@ -32,13 +32,18 @@ public class ConexionDB {
     }
 
 
-    public void desconectar(){
+    public void desconectar() {
         if (baseXCtx != null) baseXCtx.close();
         if (mongoClient != null) mongoClient.close();
         System.out.println(" Conexiones cerradas.");
     }
 
     // Métodos para que los dao puedan usar las conexiones
-    public Context getBaseXCtx() { return baseXCtx; }
-    public MongoDatabase getMongoDb() { return mongoDb; }
+    public Context getBaseXCtx() {
+        return baseXCtx;
+    }
+
+    public MongoDatabase getMongoDb() {
+        return mongoDb;
+    }
 }
