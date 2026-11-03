@@ -1,6 +1,7 @@
 package com.tienda;
 
 import com.mongodb.client.*;
+import com.tienda.dao.ClienteDAO;
 import com.tienda.dao.ProductoDAO;
 import org.bson.Document;
 import org.basex.core.Context;
@@ -20,9 +21,10 @@ public class Main {
 
         //2. Crear DAOss pasando conexion
         ProductoDAO productoDAO = new ProductoDAO(conexion.getBaseXCtx());
+        ClienteDAO clienteDAO = new ClienteDAO(conexion.getMongoDb());
 
         //3. Arrancamos el meenu
-        Menu menu = new Menu(productoDAO);
+        Menu menu = new Menu(productoDAO,clienteDAO);
         menu.mostrarMenu();
 
         conexion.desconectar();

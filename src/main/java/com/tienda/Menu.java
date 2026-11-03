@@ -1,5 +1,6 @@
 package com.tienda;
 
+import com.tienda.dao.ClienteDAO;
 import com.tienda.dao.ProductoDAO;
 
 import java.util.Scanner;
@@ -8,9 +9,11 @@ public class Menu {
 
     private Scanner sc = new Scanner(System.in);
     private ProductoDAO productoDAO;
+    private ClienteDAO clienteDAO;
 
-    public Menu(ProductoDAO productoDAO) {
+    public Menu(ProductoDAO productoDAO, ClienteDAO clienteDAO) {
         this.productoDAO = productoDAO;
+        this.clienteDAO = clienteDAO;
         this.sc = new Scanner(System.in);
     }
 
@@ -29,6 +32,8 @@ public class Menu {
             System.out.println("6. Buscar por descripción (BaseX)");
             System.out.println("7. Porcentaje de stock por categoría (BaseX)");
             // Aquí irán las opciones de MongoDB (8 al 17)
+            System.out.println("--- CONSULTAS MONGODB ---");
+            System.out.println("8. Crear nuevo cliente");
             System.out.println("0. Salir");
             System.out.println("===========================================");
             System.out.print("Seleccione una opción: ");
@@ -43,13 +48,55 @@ public class Menu {
                         break;
 
                     case 2:
-                        opcionEliminarPrecio();
+                        opcionEliminarProducto();
                         break;
 
                     case 3:
+                        productoDAO.listarProductosAlfabeticamente();
                         break;
                     case 4:
-                        System.out.println("aun no");
+                        opcionOrdenarPorStock();
+                        break;
+
+                    case 5:
+                        productoDAO.productoMasCaroPorCategoria();
+                        break;
+
+                    case 6:
+                        opcionBuscarPorDescripcion();
+                        break;
+                    case 7:
+                        productoDAO.porcentajeStockPorCategoria();
+                        break;
+                    case 8:
+                        opcionCrearCliente();
+                        break;
+                    case 9:
+
+                        break;
+                    case 10:
+
+                        break;
+                    case 11:
+                        break;
+
+                    case 12:
+
+                        break;
+                    case 13:
+
+                        break;
+                    case 14:
+
+                        break;
+                    case 15:
+
+                        break;
+                    case 16:
+
+                        break;
+                    case 17:
+
                         break;
                     case 0:
                         System.out.println("SAliendo");
@@ -74,7 +121,6 @@ public class Menu {
 
         productoDAO.modificarPrecio(id, precio);
 
-
     }
 
     private void opcionEliminarProducto() {
@@ -85,5 +131,38 @@ public class Menu {
 
     }
 
+    private void opcionOrdenarPorStock(){
+        try {
+            System.out.println("Introduce stock minimo:");
+            int stockMinimo = Integer.parseInt(sc.nextLine());
+
+            productoDAO.listarPorStock(stockMinimo);
+        }catch (NumberFormatException e){
+            System.err.println("debes introducir un número");
+        }
+    }
+
+    private void opcionBuscarPorDescripcion(){
+
+        System.out.println("Introduce una subcadeena");
+        String subcadena = sc.nextLine();
+        productoDAO.buscarPorDescripcion(subcadena);
+
+    }
+
+
+    private void opcionCrearCliente(){
+        System.out.print("Nombre: ");
+        String nombre = sc.nextLine();
+        System.out.print("Email: ");
+        String email = sc.nextLine();
+        System.out.print("Teléfono: ");
+        String telefono = sc.nextLine();
+        System.out.print("Dirección: ");
+        String direccion = sc.nextLine();
+
+        //lamada DAO
+        clienteDAO.crearCliente(nombre,email,telefono,direccion);
+    }
 }
 

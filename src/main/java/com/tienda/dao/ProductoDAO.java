@@ -16,22 +16,58 @@ public class ProductoDAO {
     // --OPCIÓN 1: Modificar precio--
     public void modificarPrecio(String id, String nuevoPrecio){
 
+        // Preparar Texto
+        String query = "replace value of node //producto[id='" + id + "']/precio with "+ nuevoPrecio;
+
+        // Decimos al motor que ejectute
+        ejecutarActualizacion(query, "precio modificado correctamente");
+
     }
 
     public void eliminarProducto(String id){
+        String query = "delete node //producto[ id = '" + id + "']";
+
+        ejecutarActualizacion(query, "Poroducto eliminado correctamente");
     }
 
     public void listarProductosAlfabeticamente(){
 
+        // For (para cada), order by (ordenado por), return (devuelve)
+        String query = "for $p in //producto order by $p/nombre  return concat($p/id, ' | ',$p/nombre, ' | ',$p/precio, ' | ',$p/disponibilidad,' | ',$p/categoria)";
+
+        ejecutarConulta(query);
+    }
+
+
+    public void listarPorStock(int stockMinimo){
+        //
+        String query = "for $p in //producto where $p/disponibilidad > "+stockMinimo + " order by $p/nombre return concat($p/id,' | ',$p/nombre,' | ',$p/precio,' | ',$p/disponibilidad,' | ',$p/categoria)";
+
+        ejecutarConulta(query);
     }
 
 
 
+    public void productoMasCaroPorCategoria(){
+        String query = "for $cat in distinct-values(//producto/categoria) let $prods :=//producto[categoria=$cat] let $maxP := max($prods/precio) let $top := $prods[precio=$maxP][1] return concat($cat,' | ',$top/nombre,' | ',$top/precio)";
+        ejecutarConulta(query);
+    }
+
+    public void buscarPorDescripcion(String subcadena){
+        String query= "for $p in //producto where contains($p/descripcion,'" + subcadena + "') order by $p/fabricante descending return concat($p/nombre, ' | ',$p/fabricante)";
+        ejecutarConulta(query);
+
+    }
+
+    public void porcentajeStockPorCategoria(){
+        String query = "let $total := sum(//producto/disponibilidad) for $cat in distinct-values(//producto/categoria) let $sub := sum(//producto[categoria=$cat]/disponibilidad) return concat($cat, ' | ', $sub, ' | ', format-number($sub div $total * 100, '0.00'), '%')";
+        ejecutarConulta(query);
+    }
 
 
     // HELPERS
 
-    private void ejecuatrConulta(String query){
+    private void ejecutarConulta(String query){
         try{
             String resultado = new XQuery(query).execute(ctx);
 
