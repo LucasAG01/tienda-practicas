@@ -99,5 +99,15 @@ public class ProductoDAO {
 
 
 
+    //METODOS PARA EL CARRITO
+    public String obtenerProductoPorId(String id){
+        String query  = "let $p := //producto[id='"+id+"'] "+"return if ($p) then concat($p/nombre,'|',$p/precio) else ''";
+        try{
+            return new XQuery(query).execute(ctx).trim();
+        }catch (Exception e){
+            return "";
+        }
+    }
+
 
 }

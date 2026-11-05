@@ -1,5 +1,6 @@
 package com.tienda;
 
+import com.tienda.dao.CarritoDAO;
 import com.tienda.dao.ClienteDAO;
 import com.tienda.dao.ProductoDAO;
 
@@ -10,10 +11,16 @@ public class Menu {
     private Scanner sc = new Scanner(System.in);
     private ProductoDAO productoDAO;
     private ClienteDAO clienteDAO;
+    private CarritoDAO carritoDAO;
 
-    public Menu(ProductoDAO productoDAO, ClienteDAO clienteDAO) {
+
+    //Giardar al cliente logueado
+    private org.bson.types.ObjectId clienteActualId = null;
+
+    public Menu(ProductoDAO productoDAO, ClienteDAO clienteDAO, CarritoDAO carritoDAO) {
         this.productoDAO = productoDAO;
         this.clienteDAO = clienteDAO;
+        this.carritoDAO = carritoDAO;
         this.sc = new Scanner(System.in);
     }
 
@@ -34,6 +41,12 @@ public class Menu {
             // Aquí irán las opciones de MongoDB (8 al 17)
             System.out.println("--- CONSULTAS MONGODB ---");
             System.out.println("8. Crear nuevo cliente");
+            System.out.println("9. Iniciar sesion");
+            System.out.println("10. Eliminar cliente");
+            System.out.println("11. Modificar Campo");
+            System.out.println("12. Añadir producto al carrito");
+            System.out.println("13. Modificar Campo");
+            System.out.println("14. Modificar Campo");
             System.out.println("0. Salir");
             System.out.println("===========================================");
             System.out.print("Seleccione una opción: ");
@@ -72,16 +85,31 @@ public class Menu {
                         opcionCrearCliente();
                         break;
                     case 9:
-
+                        opcionIdentificarCliente();
                         break;
                     case 10:
-
+                        if(clienteActualId == null){
+                            System.out.println("Debes loguearte primero");
+                        }else {
+                            clienteDAO.eliminarCliente(clienteActualId);
+                            clienteActualId = null;
+                        }
                         break;
                     case 11:
+                        if(clienteActualId == null){
+                            System.out.println("Debes loguearte primero");
+                        }else {
+                            opcionModificarCliente();
+                        }
+
                         break;
 
                     case 12:
+                        if(clienteActualId == null){
+                            System.out.println("Debes loguearte primero");
+                        }else {
 
+                        }
                         break;
                     case 13:
 
@@ -164,5 +192,68 @@ public class Menu {
         //lamada DAO
         clienteDAO.crearCliente(nombre,email,telefono,direccion);
     }
+
+
+    private void opcionIdentificarCliente(){
+        System.out.println("Introduce email del cliente");
+        String email = sc.nextLine();
+
+        //Llamamso al dao
+        org.bson.types.ObjectId idEncontrado = clienteDAO.identiifcarCliente(email);
+
+        if(idEncontrado !=null){
+            clienteActualId = idEncontrado;
+
+            System.out.println("Cliente identificado correctamente, sesion iniciada");
+        }else{
+            System.out.println("Error, no hay cliente con ese mail");
+        }
+    }
+
+    private void opcionModificarCliente(){
+
+        System.out.println("¿Qué campo quieres modificar? (nombre/telefono/direccion): ");
+        String campo = sc.nextLine();
+        System.out.println("Intriduce nuevo valor");
+        String valor = sc.nextLine();
+
+        clienteDAO.modificarCampoCliente(clienteActualId, campo, valor);
+
+    }
+
+
+    private void opcionAgregarAlCarrito(){
+        boolean seguir = true;
+        while (seguir){
+            System.out.println("Introduce el ID de BASEX");
+            String idStr = sc.nextLine();
+
+            // 1. Preguntamos a BAseX
+            String datosProducto = productoDAO.obtenerProductoPorId(idStr);
+
+            if(datosProducto.isEmpty()){
+                System.out.println("Error Producto no encontrado");
+            }else {
+                // 2.- Separamos nombre y precio
+                String[] partes = datosProducto.split("\\|");
+                String nombre = partes[0];
+                double precio = Double.parseDouble(partes[1]);
+
+                System.out.println("Introduce cantidad: ");
+                int cantidad = Integer.parseInt(sc.nextLine());
+
+                // 3.- Guardamos en MOngo
+                carritoDAO.agregarProducto(clienteActualId,Integer.parseInt(idStr),nombre,precio,cantidad);
+                System.out.println("Producto añadido al carrito");
+            }
+
+            System.out.print("¿Quieres añadir otro producto? (s/n): ");
+            String respuesta = sc.nextLine();
+            if (respuesta.equalsIgnoreCase("n")) {
+                seguir = false;
+            }
+        }
+    }
+
 }
 

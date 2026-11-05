@@ -39,5 +39,42 @@ public class ClienteDAO {
 
 
 
+    // Identificar el cliente por email
+    public org.bson.types.ObjectId identiifcarCliente(String email){
 
+        //Buscar primer cliente que coincida
+        Document cliente = coleccionClientes.find(eq("email",email)).first();
+
+        if(cliente != null){
+            //Si existe sacamos _id y devolvemos
+            return cliente.getObjectId("_id");
+        }else {
+            return null;
+        }
+
+    }
+
+
+
+    // Borrar cliente
+    public void eliminarCliente(org.bson.types.ObjectId id){
+        //Borramos el documento que tenga ese _id
+        coleccionClientes.deleteOne(eq("_id",id));
+
+        System.out.println("CLiente eliminado correctamnte");
+    }
+
+    // MOdificar un campo
+    public void modificarCampoCliente(org.bson.types.ObjectId id, String campo, String nuevoValor){
+
+        // $set sirve para actualizar solo el campo indicado
+        Document actualizacion = new Document("$set", new Document(campo, nuevoValor));
+
+        coleccionClientes.updateOne(eq("_id",id),actualizacion);
+        System.out.println("Campo '"+campo+"' modificado a: " + nuevoValor);
+
+    }
+
+
+    //
 }
